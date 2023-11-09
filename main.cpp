@@ -35,33 +35,36 @@ void simpleSortTotal(LinkedList* s, int low, int high);
 int partition(LinkedList* s, int low, int high);
 double distanceEarth(double lat1d, double lon1d, double lat2d, double lon2d);
 double distanceAus(Airport* data) {
-  return distanceEarth(data->latitude, data->longitude, 30.1944, 97.67);
+  return distanceEarth(data->latitude, data->longitude, 30.19449997, -97.66989899);
 }
 
 int main()
 {
     ifstream infile;
     int i=0;
-    char cNum[10] ;
+    char cNum[100] ;
     LinkedList* airportList= new LinkedList();
-    infile.open ("./USAirportCodes.csv", ifstream::in);
+    infile.open ("airport-codes_US.csv", ifstream::in);
     if (infile.is_open())
     {
       string header;
-      getline(infile, header);
+      //getline(infile, header);
         while (infile.good())
         {
           Airport * val = new Airport();
             infile.getline(val->code, 256, ',');
             infile.getline(cNum, 256, ',');
-            val->latitude = atof(cNum);
-            infile.getline(cNum, 256, '\n');
+            infile.getline(cNum, 256, ',');
+            infile.getline(cNum, 256, ',');
             val->longitude = atof(cNum);
+          infile.getline(cNum, 256, ',');
+            val->latitude = atof(cNum);
           airportList->add(val);
+          infile.ignore(256, '\n');
         }
       
       simpleSortTotal(airportList, 0, airportList->size()-1);
-      int farthestIndex = airportList->size()-2;
+      int farthestIndex = airportList->size()-12;
       Airport* farthestAirport = airportList->get(farthestIndex);
       cout << "Farthest airport from Austin-Bergstorm International airport is: " << farthestAirport -> code << "  " <<distanceAus(farthestAirport) << " miles away" << endl;
       const double maxDistance = 100.0;
@@ -70,7 +73,7 @@ int main()
         Airport* currentAirport = airportList->get(i);
         double distance = distanceAus(currentAirport);
         if (distance <= maxDistance) {
-          cout << currentAirport->code << ", ";
+          cout << currentAirport->code << " Distance: " << distanceAus(currentAirport) << " miles" << endl;
       }
       }
       infile.close();
@@ -112,7 +115,7 @@ double distanceEarth(double lat1d, double lon1d, double lat2d, double lon2d) {
   lon2r = deg2rad(lon2d);
   u = sin((lat2r - lat1r)/2);
   v = sin((lon2r - lon1r)/2);
-  return 2.0 * earthRadiusKm * asin(sqrt(u * u + cos(lat1r) * cos(lat2r) * v * v));
+  return (2.0 * earthRadiusKm * asin(sqrt(u * u + cos(lat1r) * cos(lat2r) * v * v)))/1.609;
 }
 
 
